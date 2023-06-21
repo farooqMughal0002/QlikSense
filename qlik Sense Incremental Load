@@ -1,0 +1,24 @@
+
+ExistingData:
+LOAD id, name, dept
+FROM [lib://in_test (desktop-5820mk4_bi)/LastLoadTable.qvd](qvd);
+
+
+MaxExistingID:
+LOAD Max(id) as MaxID
+RESIDENT ExistingData;
+
+LET vMaxID = Peek('MaxID', 0, 'MaxExistingID');
+//Drop Table ExistingData;
+
+
+Concatenate(ExistingData)
+NewData:
+LOAD
+    id,
+    name,
+    dept
+FROM [lib://in_test (desktop-5820mk4_bi)/test.xlsx]
+(ooxml, embedded labels, table is Sheet1) where id > $(vMaxID);
+
+STORE ExistingData INTO [lib://in_test (desktop-5820mk4_bi)/LastLoadTable.qvd](qvd);
